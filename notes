@@ -1,0 +1,184 @@
+import { StatusBar } from 'expo-status-bar';
+import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  TextInput,
+  TabBarIOS,
+} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+
+function HomeScreen({ navigation, route }) {
+  React.useEffect(() => {
+    if (route.params?.post) {
+      // Post updated, do something with `route.params.post`
+      // For example, send the post to the server
+    }
+  }, [route.params?.post]);
+  return (
+    <View style={styles.container}>
+      <Text style={styles.text}>Home Screen</Text>
+      <Button
+        title='Go to Details'
+        onPress={() => {
+          navigation.navigate('Details', {
+            helpId: 86,
+            otherParams: 'I am a parameter',
+          });
+        }}
+      />
+      <Button
+        title='Create post'
+        onPress={() => navigation.navigate('CreatePost')}
+      />
+      <Text style={{ margin: 10 }}>
+        Post: {route.params?.post}
+      </Text>
+    </View>
+  );
+}
+
+function BottomTabNavigator() {
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name='Feed' component={Feed} />
+    </Tab.Navigator>
+  );
+}
+
+function DetailsScreen({ route, navigation }) {
+  const { helpId, otherParam } = route.params;
+  console.log(route.params);
+  return (
+    <View style={styles.container}>
+      <Text>helpId: {JSON.stringify(helpId)}</Text>
+      <Text>otherParam: {JSON.stringify(otherParam)}</Text>
+      <Text style={styles.text}>Details Screen</Text>
+      <Button
+        title='Go to Home'
+        onPress={() => navigation.navigate('Home')}
+      />
+    </View>
+  );
+}
+
+function CreatePostScreen({ navigation, route }) {
+  const [postText, setPostText] = React.useState('');
+
+  return (
+    <>
+      <TextInput
+        multiline
+        placeholder="What's on your mind?"
+        style={{
+          height: 200,
+          padding: 10,
+          backgroundColor: 'white',
+        }}
+        value={postText}
+        onChangeText={setPostText}
+      />
+      <Button
+        title='Done'
+        onPress={() => {
+          // Pass and merge params back to home screen
+          navigation.navigate({
+            name: 'Home',
+            params: { post: postText },
+            merge: true,
+          });
+        }}
+      />
+    </>
+  );
+}
+
+const Stack = createStackNavigator();
+
+export default function App() {
+  return (
+    /* <View style={styles.container}>
+      <Text style={styles.text}>
+        Open up App.js to start working on your app!
+      </Text>
+      <StatusBar style='auto' />
+      <TouchableOpacity
+        onPress={() => alert('Hello, world!')}
+        style={styles.button}
+      >
+        <Text style={styles.buttonText}>Pick a photo</Text>
+      </TouchableOpacity>
+    </View> */
+    <NavigationContainer>
+      <Stack.Navigator
+        initialRouteName='Home'
+        screenOptions={{
+          headerStyle: {
+            backgroundColor: 'black',
+          },
+          headerTintColor: 'pink',
+          headerTitleStyle: {
+            fontWeight: 'bold',
+            alignSelf: 'center',
+          },
+        }}
+      >
+        <Stack.Screen
+          name='Home'
+          component={HomeScreen}
+          style={styles.header}
+
+          /* options={{ headerShown: false }} */
+        />
+        <Stack.Screen
+          name='BottomTab'
+          component={BottomTabNavigator}
+        />
+        <Stack.Screen
+          name='Details'
+          component={DetailsScreen}
+        />
+        <Stack.Screen
+          name='CreatePost'
+          component={CreatePostScreen}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  text: {
+    color: '#888',
+    fontSize: 18,
+  },
+  button: {
+    backgroundColor: 'blue',
+    padding: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    fontSize: 20,
+    color: '#fff',
+  },
+});
+
+const config = {
+  headerStyle: {
+    backgroundColor: '#f4511e',
+  },
+  headerTintColor: '#fff',
+  headerTitleStyle: {
+    fontWeight: 'bold',
+  },
+};
